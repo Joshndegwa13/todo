@@ -96,7 +96,7 @@ function App() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => undoComplete(i)}
-                    className="text-yellow-400 hover:text-yellow-500"
+                    className="text-yellow-500 hover:text-yellow-500"
                   >
                     <XCircle size={20} />
                   </button>
