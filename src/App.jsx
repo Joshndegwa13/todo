@@ -1,15 +1,35 @@
 import React, { useState } from 'react';
-import { ListTodo, Plus, Trash2 } from 'lucide-react';
+import { ListTodo, Plus, Trash2, CheckCircle, XCircle } from 'lucide-react';
 
 function App() {
-  const [todos, setTodos] = useState([]);
   const [input, setInput] = useState('');
+  const [pendingTodos, setPendingTodos] = useState([]);
+  const [completedTodos, setCompletedTodos] = useState([]);
 
-  // add function
   const addTodo = () => {
     if (input) {
-      setTodos([...todos, input]);
+      setPendingTodos([...pendingTodos, input]);
       setInput('');
+    }
+  };
+
+  const completeTodo = (index) => {
+    const todoToComplete = pendingTodos[index];
+    setPendingTodos(pendingTodos.filter((_, i) => i !== index));
+    setCompletedTodos([...completedTodos, todoToComplete]);
+  };
+
+  const undoComplete = (index) => {
+    const todoToUndo = completedTodos[index];
+    setCompletedTodos(completedTodos.filter((_, i) => i !== index));
+    setPendingTodos([...pendingTodos, todoToUndo]);
+  };
+
+  const deleteTodo = (index, isCompleted) => {
+    if (isCompleted) {
+      setCompletedTodos(completedTodos.filter((_, i) => i !== index));
+    } else {
+      setPendingTodos(pendingTodos.filter((_, i) => i !== index));
     }
   };
 
@@ -27,32 +47,70 @@ function App() {
           <input
             value={input}
             onChange={e => setInput(e.target.value)}
+            onKeyPress={e => e.key === 'Enter' && addTodo()}
             placeholder="New task"
             className="w-full p-2 bg-zinc-800 text-white border border-purple-500 rounded-lg"
           />
           <button
             onClick={addTodo}
-            className="w-full mt-2 bg-purple-600 text-white p-2 rounded-lg flex items-center justify-center gap-2"
+            className="w-full mt-2 bg-purple-600 text-white p-2 rounded-lg flex items-center justify-center gap-2 hover:bg-purple-700"
           >
             <Plus />
             Add
           </button>
         </div>
 
-      
-        <ul className="space-y-2">
-          {todos.map((todo, i) => (
-            <li key={i} className="flex justify-between p-2 bg-zinc-800 rounded-lg">
-              <span className="text-white">{todo}</span>
-              <button
-                onClick={() => setTodos(todos.filter((_, index) => index !== i))}
-                className="text-purple-400"
-              >
-                <Trash2 />
-              </button>
-            </li>
-          ))}
-        </ul>
+        {/* Pending Tasks */}
+        <div className="mb-6">
+          <h2 className="text-purple-500 font-semibold mb-2">Pending Tasks</h2>
+          <ul className="space-y-2">
+            {pendingTodos.map((todo, i) => (
+              <li key={i} className="flex justify-between items-center p-2 bg-zinc-800 rounded-lg">
+                <span className="text-white">{todo}</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => completeTodo(i)}
+                    className="text-green-400 hover:text-green-500"
+                  >
+                    <CheckCircle size={20} />
+                  </button>
+                  <button
+                    onClick={() => deleteTodo(i, false)}
+                    className="text-purple-400 hover:text-purple-500"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Completed Tasks */}
+        <div>
+          <h2 className="text-purple-500 font-semibold mb-2">Completed Tasks</h2>
+          <ul className="space-y-2">
+            {completedTodos.map((todo, i) => (
+              <li key={i} className="flex justify-between items-center p-2 bg-zinc-800 rounded-lg opacity-75">
+                <span className="text-white line-through">{todo}</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => undoComplete(i)}
+                    className="text-yellow-400 hover:text-yellow-500"
+                  >
+                    <XCircle size={20} />
+                  </button>
+                  <button
+                    onClick={() => deleteTodo(i, true)}
+                    className="text-purple-400 hover:text-purple-500"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );
